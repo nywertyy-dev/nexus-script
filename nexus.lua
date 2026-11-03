@@ -9,10 +9,15 @@ local Lighting = game:GetService("Lighting")
 local Camera = workspace.CurrentCamera
 local LocalPlayer = Players.LocalPlayer
 
+-- Ссылка на RAW-файл с ключом на GitHub
 local KeyRawURL = "https://raw.githubusercontent.com/nywertyy-dev/nexus-script/main/key.txt"
 local TelegramLink = "https://t.me/+J45h5EG2mJY4ZDgy"
 
+-- ================================================================= --
+--                         KEY SYSTEM                                --
+-- ================================================================= --
 local function startScript()
+    -- Настройки
     local Settings = {
         AimbotEnabled = false,
         SilentAimEnabled = false,
@@ -61,6 +66,84 @@ local function startScript()
     BlurEffect.Size = 0
     BlurEffect.Enabled = false
 
+    -- Экран загрузки (10 сек)
+    local LoadGui = Instance.new("ScreenGui", LocalPlayer:WaitForChild("PlayerGui"))
+    LoadGui.Name = "NEXUS_Loader"
+    LoadGui.ResetOnSpawn = false
+
+    local LoadFrame = Instance.new("Frame", LoadGui)
+    LoadFrame.Size = UDim2.new(0, 380, 0, 180)
+    LoadFrame.Position = UDim2.new(0.5, -190, 0.5, -90)
+    LoadFrame.BackgroundColor3 = Color3.fromRGB(12, 12, 16)
+    LoadFrame.BorderSizePixel = 0
+    Instance.new("UICorner", LoadFrame).CornerRadius = UDim.new(0, 12)
+
+    local LoadStroke = Instance.new("UIStroke", LoadFrame)
+    LoadStroke.Color = Color3.fromRGB(240, 240, 240)
+    LoadStroke.Thickness = 1.5
+
+    local LoadTitle = Instance.new("TextLabel", LoadFrame)
+    LoadTitle.Size = UDim2.new(1, 0, 0, 40)
+    LoadTitle.BackgroundTransparency = 1
+    LoadTitle.Text = "NEXUS"
+    LoadTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
+    LoadTitle.TextSize = 20
+    LoadTitle.Font = Enum.Font.GothamBold
+
+    local LoadSub = Instance.new("TextLabel", LoadFrame)
+    LoadSub.Size = UDim2.new(1, 0, 0, 30)
+    LoadSub.Position = UDim2.new(0, 0, 0, 40)
+    LoadSub.BackgroundTransparency = 1
+    LoadSub.Text = "Initializing modules..."
+    LoadSub.TextColor3 = Color3.fromRGB(150, 150, 160)
+    LoadSub.TextSize = 12
+    LoadSub.Font = Enum.Font.GothamMedium
+
+    local BarBg = Instance.new("Frame", LoadFrame)
+    BarBg.Size = UDim2.new(0.85, 0, 0, 10)
+    BarBg.Position = UDim2.new(0.075, 0, 0, 100)
+    BarBg.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
+    BarBg.BorderSizePixel = 0
+    Instance.new("UICorner", BarBg).CornerRadius = UDim.new(1, 0)
+
+    local BarFill = Instance.new("Frame", BarBg)
+    BarFill.Size = UDim2.new(0, 0, 1, 0)
+    BarFill.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    BarFill.BorderSizePixel = 0
+    Instance.new("UICorner", BarFill).CornerRadius = UDim.new(1, 0)
+
+    local PercentText = Instance.new("TextLabel", LoadFrame)
+    PercentText.Size = UDim2.new(1, 0, 0, 20)
+    PercentText.Position = UDim2.new(0, 0, 0, 125)
+    PercentText.BackgroundTransparency = 1
+    PercentText.Text = "0%"
+    PercentText.TextColor3 = Color3.fromRGB(200, 200, 200)
+    PercentText.TextSize = 12
+    PercentText.Font = Enum.Font.GothamBold
+
+    task.spawn(function()
+        local startTime = tick()
+        local duration = 10
+        while true do
+            local elapsed = tick() - startTime
+            local progress = math.clamp(elapsed / duration, 0, 1)
+            BarFill.Size = UDim2.new(progress, 0, 1, 0)
+            PercentText.Text = math.floor(progress * 100) .. "%"
+            if progress >= 1 then break end
+            task.wait(0.03)
+        end
+        local tweenInfo = TweenInfo.new(0.8, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+        TweenService:Create(LoadFrame, tweenInfo, {BackgroundTransparency = 1}):Play()
+        TweenService:Create(LoadTitle, tweenInfo, {TextTransparency = 1}):Play()
+        TweenService:Create(LoadSub, tweenInfo, {TextTransparency = 1}):Play()
+        TweenService:Create(BarBg, tweenInfo, {BackgroundTransparency = 1}):Play()
+        TweenService:Create(BarFill, tweenInfo, {BackgroundTransparency = 1}):Play()
+        TweenService:Create(PercentText, tweenInfo, {TextTransparency = 1}):Play()
+        task.wait(0.8)
+        LoadGui:Destroy()
+    end)
+
+    -- Watermark HUD
     local HUDGui = Instance.new("ScreenGui", LocalPlayer:WaitForChild("PlayerGui"))
     HUDGui.Name = "NEXUS_HUD"
     HUDGui.ResetOnSpawn = false
@@ -81,7 +164,7 @@ local function startScript()
     RunService.RenderStepped:Connect(function()
         local fps = math.floor(1 / RunService.RenderStepped:Wait())
         local ping = math.floor(Stats.Network.ServerStatsItem["Data Ping"]:GetValue())
-        Watermark.Text = string.format("  NEXUS | Deagle Duels | %d FPS | %dms", fps, ping)
+        Watermark.Text = string.Format("  NEXUS | Deagle Duels | %d FPS | %dms", fps, ping)
     end)
 
     local FOVCircleDrawing = Drawing.new("Circle")
@@ -296,6 +379,7 @@ local function startScript()
         end
     end)
 
+    -- GUI
     local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
     if PlayerGui:FindFirstChild("NEXUS_TabMenu") then PlayerGui.NEXUS_TabMenu:Destroy() end
 
@@ -446,8 +530,10 @@ local function startScript()
             end
         end
     end)
+    print("[NEXUS] Key verification successful. Script loaded!")
 end
 
+-- GUI окна проверки ключа
 local KeyGui = Instance.new("ScreenGui", LocalPlayer:WaitForChild("PlayerGui"))
 KeyGui.Name = "NEXUS_KeySystem"
 KeyGui.ResetOnSpawn = false
@@ -519,6 +605,7 @@ CheckBtn.MouseButton1Click:Connect(function()
     end)
     
     if success and currentKey then
+        -- Очищаем ключ от лишних переносов строк или пробелов
         currentKey = currentKey:gsub("%s+", "")
         local userKey = KeyBox.Text:gsub("%s+", "")
         
