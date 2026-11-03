@@ -14,7 +14,7 @@ local KeyRawURL = "https://raw.githubusercontent.com/nywertyy-dev/nexus-script/m
 local TelegramLink = "https://t.me/+J45h5EG2mJY4ZDgy"
 
 -- ================================================================= --
---                         KEY SYSTEM                                --
+--                             KEY SYSTEM                            --
 -- ================================================================= --
 local function startScript()
     -- Настройки
@@ -164,7 +164,7 @@ local function startScript()
     RunService.RenderStepped:Connect(function()
         local fps = math.floor(1 / RunService.RenderStepped:Wait())
         local ping = math.floor(Stats.Network.ServerStatsItem["Data Ping"]:GetValue())
-        Watermark.Text = string.Format("  NEXUS | Deagle Duels | %d FPS | %dms", fps, ping)
+        Watermark.Text = string.format("  NEXUS | Deagle Duels | %d FPS | %dms", fps, ping)
     end)
 
     local FOVCircleDrawing = Drawing.new("Circle")
